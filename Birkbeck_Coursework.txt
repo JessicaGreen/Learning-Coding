@@ -1,0 +1,485 @@
+###### Task 1
+
+# 1.1
+# This function imports a csv and transforms it into a list. This method includes the column headers as the first row of the list.
+
+def Create_csv_list(filename):           # The function contains one argument: the filename of the csv file to be imported.
+    import csv                           # Imports the python csv module.
+    with open(filename,'r') as f:        # Opens the csv file in read only format, and assigns it the variable f.
+        reader = csv.reader(f)           # Reads the opened csv file.
+        my_list = list(reader)           # Converts the reader to a list.
+        return my_list 
+    
+#print(Create_csv_list("bl_printed_music_500.csv"))        # Calls function by printing it.
+#print(Create_csv_list("bl_printed_music_500.csv")[0][0])  # Prints the item in the first row and first column
+#print(len(Create_csv_list("bl_printed_music_500.csv")))   # Prints the length of the list. I then checked this matched the number of rows matches the csv file.
+
+# 1.2
+# This function imports a csv and transforms it into a dictionary. 
+        
+def Create_csv_Dict(filename):
+    import csv
+    with open(filename,newline='',encoding="utf-8-sig") as f:
+        reader=csv.DictReader(f)
+        return reader
+
+#print(Create_csv_Dict("bl_printed_music_500.csv"))          # Calls function by printing it.
+#print(len(Create_csv_Dict("bl_printed_music_500.csv")))
+
+# When printed this function does not return a dictionary. It returns <csv.DictReader object at 0x107e54b70>. I have therefore not resued this function in the answers to the questions below.
+# It is not clear why this csv.DictReader method does not return a dictionary in this function when the same csv.DictReader method creates a usable dictionary in the answers below.
+        
+# Another method I tried:
+def Create_csv_Dict2(filename):           # The function contains one argument: the filename of the csv file to be imported.
+    my_dict={}                           # Creates an empty dictionary
+    import csv                           # Imports the python csv module.
+    with open(filename,'r') as f:        # Opens the csv file in read only format, and assigns it the variable f.
+        reader = csv.reader(f)           # Reads the opened csv file.
+        my_list = list(reader)           # Converts the reader to a list.
+        for item in my_list[0]:
+            my_dict[item]=[]             # Creates a dictionary key for each value in the first row. But it does not assign values to these keys.
+        return my_dict 
+    
+#print(Create_csv_Dict2("bl_printed_music_500.csv"))        # Calls function by printing it.
+# This alternative method successfully created the dictionary, but I could not work out how to assign the list of values for each key.
+
+# 1.3
+# This function searches for a composer and returns the corresponding ID everytime that composer is found.
+# The results are returned as an immutable list.
+        
+def Find_Composer_List1(filename):
+    composer=input("Enter the exact name of the composer you want to search for: ")   # Asks the user to input the name of the composer they want to search for.
+    ids=[]                                                                      # Creates an empty list
+    import csv
+    with open(filename,newline='',encoding="utf-8-sig") as f:
+        reader=csv.DictReader(f)
+        for row in reader:
+            if composer == row["Composer"]:     # This ensures an exact match. To loosen the search parameters, I could replace this with >> if composer in row["Composer"]: << This looser method would mean it is possible for ids from multiple people to be grouped together (e.g. searching for "Abbott" would return Ids for "Abbott, Mary" and "Abbott, Lyman").
+                ids.append(row["BL record ID"]) # This adds the corresponding IDs to the list.
+        return tuple(ids)                       # Tuples are immutable. This converts the final list to a tuple.
+        
+#print(Find_Composer_List1("bl_printed_music_500.csv"))      # This calls the function by printing it. It prints the immutable list of IDs.
+
+# I chose to include the composer variable as a user input statement within the function.
+# Alternatively I could have included << composer >> as a second argument of the function << e.g. Find_Composer_List(filename, composer)
+# In this alternative scenario, the call function would have been either:
+#   a. Find_Composer_List("bl_printed_music_500.csv",'Name_of_Person')
+#   b. Find_Composer_List("bl_printed_music_500.csv",input("Enter the name of the composer you want to search for: "))
+
+# 1.4
+# This function searches for a composer and returns the corresponding ID everytime that composer is found.
+# The results are returned as a dictionary
+        
+def Find_Composer_Dict(filename):
+    composer=input("Enter the exact name of the composer you want to search for: ")   # I could have removed this line and made composer a second argument of the function.
+    ids={}                                                                            # Creates an empty dictionary.
+    compids=[]                                                                        # Creates an empty list.
+    import csv
+    with open(filename,newline='',encoding="utf-8-sig") as f:
+        reader=csv.DictReader(f)
+        for row in reader:
+            if composer == row["Composer"]:             # This ensures an exact match. To loosen the search parameters, I could replace this with >> if composer in row["Composer"]: << This looser method would have mean it is possible for ids from multiple people to be grouped together (e.g. searching for "Abbott" would return Ids for "Abbott, Mary" and "Abbott, Lyman")
+                compids.append(row["BL record ID"])     # This creates a list of the relevant IDs
+        ids[composer]=compids                           # This creates a dictionary key out of the search term and assigns the list of ids as the key's values.
+        return(ids)                                     # This returns the dictionary created by the function.
+
+#print(Find_Composer_Dict("bl_printed_music_500.csv"))      # Calls function by printing it. It prints the key and its list of values.
+
+# 1.5
+# This function counts the number of times a value is found in a column.
+        
+def Count_Value_in_Column(filename,column,search_term):             # The search parameters are included as function arguments.
+    count=0                                                         # Creates a counter and sets the default value as 0.
+    import csv
+    with open(filename,newline='',encoding="utf-8-sig") as f:
+        reader=csv.DictReader(f)
+        for row in reader:
+            if search_term in row[column]:                          # If the selected search term is found in the selected column
+                count+=1                                            # The counter increases by 1.
+        return(count)                                               # Returns the number of occurences.
+
+#print(Count_Value_in_Column("bl_printed_music_500.csv","Publisher","Penguin Books"))    # Calls function by printing it.
+
+# This time I chose to include the column name and search term variables as function arguments.
+# I could instead have inserted two user input variables into the function. For example:
+
+def Count_Value_in_Column1(filename):
+    column=input("Which column do you want to search? ")            # Column variable as an input statement.
+    search_term=input("What do you want to search for? ")           # Search term variable as an input statement.
+    count=0
+    import csv
+    with open(filename,newline='',encoding="utf-8-sig") as f:
+        reader=csv.DictReader(f)
+        for row in reader:
+            if search_term in row[column]:
+                count+=1
+        return(count)
+
+#print(Count_Value_in_Column1("bl_printed_music_500.csv"))           # Calls function by printing it.
+
+# 1.6
+# This counts the number of times each item appears in a list and returns the result as dictionary.
+        
+Levels=["Fonds","Series","File","File","File","Series","File","File"]           # This is the list I want to interrogate.
+
+def Count_List(the_list):                   # The function contains one input argument, for the list I want to count.
+    counts={}                               # Creates an empty dictionary.
+    for item in the_list:
+        if item not in counts:      
+            counts[item]=1                  # This creates a dictionary key every time it finds a new item (i.e. for every unique item) in the list and assigns it a value of 1.
+        else:
+            counts[item] = counts[item]+1   # Each time a dictionary key is found again in the list, this increases the counter by 1 and therefore updates the key values.
+    return(counts)                          # Returns the dictionary.
+
+#print(Count_List(Levels))                  # Calls function by printing it.
+
+
+# 1.7
+# Plots results of 1.6 as a bar chart.
+    
+import matplotlib.pyplot as plt             # Imports the plot library and assigns it a short name.
+  
+#plt.bar(Count_List(Levels).keys(),Count_List(Levels).values())      # Selects the bar chart style, and inputs the values from 1.6.
+#plt.show()
+
+# 1.8
+# This function counts how many empty records exist in a column.
+
+def Count_Blanks(filename,column):          # Function has 2 arguments: 1. name of csv file to open; 2. Name of column to search.
+    count=0                                 # Creates a counter. Sets default value as 0.
+    import csv
+    with open(filename,newline='',encoding="utf-8-sig") as f:
+        reader=csv.DictReader(f)
+        for row in reader:
+            if row[column] == "":
+                count+=1                    # Counter increases by 1 every time an empty record is found.
+        return count
+
+#print(Count_Blanks('bl_printed_music_500.csv',"Composer"))     # Calls function by printing it.
+# This function always counts blanks. I could have replaced "" with a variable linke to a 3rd argument of the function, so that the function could be used to search for other things to count.
+
+# 1.9
+# This function replaces blanks in one column with data from another column. It returns the revised column as a list.
+
+def Replace_Blanks(filename,blanks_column,data_column):
+    dates_list=[]                                       # Creates an empty list.
+    import csv
+    with open(filename,newline='',encoding="utf-8-sig") as f:
+        reader=csv.DictReader(f)
+        for row in reader:
+            if row[blanks_column] == "":
+                dates_list.append(row[data_column])     # Every time it finds a blank record in one column, it adds the value from the other column to the list.
+            elif row[blanks_column] != "":              # This ensures that the list includes both the dates that replaced the blanks and the dates that were already present. If I only wanted to include the dates that replaced blank values, I would remove this elif statement.
+                dates_list.append(row[blanks_column])   
+        return dates_list                               # Returns new list of dates.
+
+#print(Replace_Blanks('bl_printed_music_500.csv','Publication date (not standardised)','Publication date (standardised)'))       # Calls function by printing it. Prints new list of dates.
+#print(len(Replace_Blanks('bl_printed_music_500.csv','Publication date (not standardised)','Publication date (standardised)')))  # Prints the length of the new list. I checked that this matched the number of rows in the csv.
+
+# 1.10
+# This function calculates the percentage that a value exists in a column.
+        
+def Calc_Percent(filename,column,item):
+    count_all=0                                                     # Creates a counter for everything.
+    count_item=0                                                    # Creates a counter for the search term.
+    count_non_blanks=0                                              # Creates a counter for non blanks.
+    import csv
+    with open(filename,newline='',encoding="utf-8-sig") as f:
+        reader=csv.DictReader(f)
+        for row in reader:
+            count_all+=1                                            # Increases the first counter for every single row.
+            if row[column] == item:
+                count_item+=1                                       # Increases the second counter every time the specific search term is found.
+            if row[column] != "":
+                count_non_blanks += 1                               # Increases the third counter for every row that is not blank.
+        return (item,round(count_item/count_all*100,2),round(count_item/count_non_blanks*100,2))   # I included *100 to convert the result from a fraction to a percentage figure. And I rounded the percentages to 2 decimal places.
+
+#print(Calc_Percent('bl_printed_music_500.csv','Place of publication','London')) # Calls function by printing it. Prints the search term, the proportion the value appears inclusive of blank cells, and the proportion exclusing blank cells.
+
+# 1.11
+# This function counts how many rows a keyword is found in a column. If not found it returns False.
+        
+def Search_Keyword(filename,column,keyword):
+    count=0                                                         # Creates a counter.
+    import csv
+    with open(filename,newline='',encoding="utf-8-sig") as f:
+        reader=csv.DictReader(f)
+        for row in reader:
+            if keyword in row[column]:
+                count+=1                                            # Increases counter by 1 each time the keyword is found in the column.
+        if count <= 0:                                              # I could probbly have set this as ==
+            result = False                                          # Returns False (Boolean) if the counter is not greater than 0.
+        else:
+            result = count                                          # If the counter is greater than 0, it returns the count.
+        return(result)
+
+#print(Search_Keyword('bl_printed_music_500.csv','Title','the'))    # Calls function by printing it.
+
+# 1.12
+# This series of two functions extracts rows from 3 columns based on certain criteria and generates a new csv file containing data from these filtered columns.
+        
+# The first function filters the original data and returns it as a 2d list.    
+def Create_csv1(column1,column2,column3):
+    templist=[[column1,column2,column3]]                            
+    import csv
+    with open('bl_printed_music_500_Write.csv',newline='',encoding="utf-8-sig") as f:
+        reader=csv.DictReader(f)
+        for row in reader:
+            if row[column1].startswith("A") and row[column2] != "" and int(row[column3]) >= 1600 and int(row[column3]) <=1900:      # I interpreted part b of the question as including 1600 and 1900 within the search range.
+                templist.append([row[column1],row[column2],row[column3]])
+    return(templist)                                                                                                                # Returns a new 2d list.
+
+# The second function generates a csv file using the 2d list returned from the previous function.
+def Create_csv2(column1,column2,column3):
+    data = Create_csv1(column1,column2,column3)                             # Establishes a variable to represent the 2d list imported from the previous function.
+    import csv
+    with open('newdata.csv','w+',encoding="utf-8",newline='') as f:         # Opens a new csv file or replaces an existing file with the same name.
+        wr = csv.writer(f,delimiter=',')                                    # Sets rule to separate values by commas.
+        wr.writerows(data)                                                  # Writes rows to the csv file using the data imported from the previous function.
+
+#Create_csv2('Composer','Publisher','Publication date (standardised)')   # Calls function. This generates a csv file.
+
+# Tested by opening the csv file and checking the 3 columns have been generated matching the rules.
+
+
+##### Task 2
+
+# 2.1
+# Performs a linear search
+
+def Linear_Search(filename,column,keyword):
+    flag=False                                                  # Sets a Boolean value as False
+    count=0
+    import csv
+    with open(filename,newline='',encoding="utf-8-sig") as f:
+        reader=csv.DictReader(f)
+        for row in reader:
+            if row[column]!="" and keyword in row[column]:      
+                count+=1                                        # Increases the counter by 1 each time the keyword is found.
+                flag=True,count                                 # Changes the Boolean value to True and places the count alongside it, if the keyword is found.
+    return(flag)
+
+#print(Linear_Search('bl_printed_music_500.csv','Publication date (standardised)','1960'))      # Calls function by printing it.
+
+
+# 2.2
+# Performs a binary search
+
+def Binary_Search(filename,column,keyword):
+    ordered_list=[]                                 # Creates a blank list
+    import csv
+    with open(filename,newline='',encoding="utf-8-sig") as f:
+        reader=csv.DictReader(f)
+        for row in reader:
+            if row[column] != "":
+                ordered_list.append(row[column])    # Adds non-blank values to the list that I will run the binary search on.
+        ordered_list.sort()                         # Sorts the list chronologically because a binary search requires an ordered list. I researched this sort function via http://wwww.geeksforgeeks.org/python-list-sort/ [last accessed 16 December 2019].
+        left = 0                                    # Establishes the start of the list (for later calculating the mid-point).
+        right = len(ordered_list)-1                 # Establishes the end of the list (for later calculating the mid-point).
+        while left <= right:                        # This keeps running the search until left > right
+            mid = int(left + (right - left)/2);     # This finds the middle point of the list
+            if ordered_list[mid] == keyword:        # If the search term is found in the middle of the list, it returns boolean value of True.
+                return True
+            elif ordered_list[mid] < keyword:       # If the search term is not found, this alters the value of left, so that the next iteration of the while loop searches the mid-point of the left half of the list.
+                left = mid + 1
+            else:                                   # If the search term is not found, this alters the value of right, so that the next iteration of the while loop searches the mid-point of the right half of the list.
+                right = mid - 1
+        return False                                # If the search term is not found when the while loop ends, it returns a boolean value of false.
+
+#print(Binary_Search('bl_printed_music_500.csv',"Publication date (standardised)","1960"))   # Calls function by printing it. Prints a boolean value (True or False).
+
+
+# 2.3
+# Performs a binary search and counts the number of iterations it takes to complete the search.
+
+def Binary_Search_Count(filename,column,keyword):
+    ordered_list=[]
+    import csv
+    with open(filename,newline='',encoding="utf-8-sig") as f:
+        reader=csv.DictReader(f)
+        for row in reader:
+            if row[column] != "":
+                ordered_list.append(row[column])    
+        ordered_list.sort()             
+        left = 0
+        right = len(ordered_list)-1
+        count=0                                     # Creates a counter.
+        while left <= right:            
+            mid = int(left + (right - left)/2);
+            count+=1                                # This increases the count each time a new iteration of the while loop begins.
+            if ordered_list[mid] == keyword:
+                return True, count                  # If found, it returns the Boolean value of True and the count of iterations.
+            elif ordered_list[mid] < keyword:
+                left = mid + 1
+            else:
+                right = mid - 1
+        return False, count                         # If not found, it returns the Boolean value of False and the count of iterations.
+                
+
+#print(Binary_Search_Count('bl_printed_music_500.csv',"Publication date (standardised)","1900"))  # Calls the function by printing it.
+
+
+# Task 3
+
+# For this task, I used SQLite.
+
+###### Part 1
+
+# 3.1
+
+# To set the schema before importing the csv file, I used the following method:
+CREATE TABLE books(ID INTEGER PRIMARY KEY, Composer TEXT NOT NULL, Composer_dates TEXT, Title TEXT NOT NULL, Pub_date_standard INTEGER NOT NULL, Pub_date_non_standard INTEGER NOT NULL, Place TEXT, Publisher TEXT);
+
+# An alternative method would be to import the csv and automatically create the table without setting the schema in advance, as follows:
+.mode csv
+.import /Users/jessg/Documents/Python/Coursework/data_for_sql_task.csv books
+# I can check the default table schema with:
+.schema books
+# This alternative method would complete questions 3.1 and 3.2 in one go.
+# But having created the table schema separately, I populated the table with data from the csv file as follows in the next question.
+
+# 3.2
+# The first thing I did was save the .xlsx file as .csv
+# I then deleted the first row of the csv file. This is because I did not want the column headers to be included as the first row of values.
+# To import the csv values into the table, I then input the following commands
+.mode csv
+.import /Users/jessg/Documents/Python/Coursework/data_for_sql_task_no_header.csv books
+
+# I researched this csv import method using the quackit.com sqlite tutorial (https://www.quackit.com/sqlite/tutorial/import_data_from_csv_file.cfm [Last accessed 16 December 2019]).
+# If I had used the manual method taught in class, I would have done the following:
+INSERT INTO books(ID, Composer, Composer_dates, Title, Pub_date_standard, Pub_date_non_standard, Place, Publisher)
+VALUES (4162443."Aarons, Alfred E.","","Short Piecies and Hymn Tunes.",1915,1915,"London","Joseph Williams");
+# I would have then had to repeat this for each row of the spreadsheet.
+
+# 3.3
+SELECT Composer,Title,Pub_date_standard,Place,Publisher FROM books WHERE Pub_date_standard = "1900";
+
+# 3.4
+SELECT Composer,Title,Pub_date_standard,Place,Publisher FROM books WHERE Place = "London" OR Place = "Basel";
+
+# 3.5
+SELECT COUNT(DISTINCT Composer) FROM books;
+
+# 3.6
+SELECT AVG(Pub_date_standard) FROM books;
+
+# 3.7
+SELECT COUNT(Pub_date_standard) FROM books WHERE Pub_date_standard = 1976;
+# I did not include Pub_date_standard in the SELECT statement because there is only one search term and only one result, so it is clear what the count result relates to.
+
+# 3.8
+SELECT Pub_date_standard,COUNT(Title) FROM books GROUP BY Pub_date_standard;
+
+# 3.9
+SELECT Composer,Title,Pub_date_standard,Place,Publisher FROM books WHERE Place = "New York";
+
+# 3.10
+SELECT Composer,Title,Pub_date_standard,Place,Publisher FROM books WHERE Publisher LIKE "M%";
+
+# 3.11
+SELECT COUNT(Composer_dates) FROM books WHERE Composer_dates = "";
+
+# 3.12
+UPDATE books SET Place = "Munich" WHERE ID = "4162652";
+
+###### Part 2
+ 
+# 3.13 (a) For the diagram, see Microsoft Word document.
+
+# 3.13 (b)
+
+# The following 5 statements create the tables, which reflect the entity relationship diagram. The foreign keys ensure that the 5 tables are linked.
+CREATE TABLE Composers(Composer_ID INTEGER PRIMARY KEY, Composer TEXT NOT NULL, Composer_Life_Dates TEXT);
+
+CREATE TABLE Publishers(Publisher_ID INTEGER PRIMARY KEY, Publisher TEXT);
+
+CREATE TABLE Publications(BL_record_ID INTEGER PRIMARY KEY, Title TEXT NOT NULL, Date_std INTEGER NOT NULL, Date_non_std INTEGER NOT NULL, Composer_ID INTEGER, Publisher_ID INTEGER, FOREIGN KEY(Composer_ID) REFERENCES Composers(Composer_ID), FOREIGN KEY(Publisher_ID) REFERENCES Publishers(Publisher_ID));
+
+CREATE TABLE Places(Place_ID INTEGER PRIMARY KEY, City TEXT);
+
+CREATE TABLE Publication_Place(BL_record_ID INTEGER, Place_ID INTEGER, FOREIGN KEY(BL_record_ID) REFERENCES Publications(BL_record_ID), FOREIGN KEY(Place_ID) REFERENCES Places(Place_ID));
+
+
+# Although the coursework did not specifically ask for this next step, I populated these tables by dividing the original csv data into 5 different csv files.
+# In these new csv files I split multi-valued cells (e.g. "New York, Chicago" in "Places" was split into "New York" and  "Chicago"), removed duplicate values (e.g "Places" only needed 1 instance of "London"), and created IDs.
+# I then imported the data from these csv files into the SQL tables, with the following 5 commands.
+.import /Users/jessg/Documents/Python/Coursework/Composers.csv Composers
+.import /Users/jessg/Documents/Python/Coursework/Publishers.csv Publishers
+.import /Users/jessg/Documents/Python/Coursework/Places.csv Places
+.import /Users/jessg/Documents/Python/Coursework/Publications.csv Publications
+.import /Users/jessg/Documents/Python/Coursework/PublicationPlace.csv Publication_Place
+
+# To test the relationship betweeen two tables, I ran the following query:
+SELECT * FROM Publications WHERE Composer_ID IN (SELECT Composer_ID FROM Composers WHERE Composer = 'Aarons, Alfred E.');
+
+# To test the relationship between three tables, I ran the following query:
+SELECT Title FROM Publications WHERE BL_record_ID IN (SELECT BL_record_ID FROM Publication_Place WHERE Place_ID IN (SELECT Place_ID FROM Places WHERE City = 'London'));
+
+# To test the relationship between four tables, I ran the following query:
+SELECT Composer FROM Composers WHERE Composer_ID IN (SELECT Composer_ID FROM Publications WHERE BL_record_ID IN (SELECT BL_record_ID FROM Publication_Place WHERE Place_ID = (SELECT Place_ID FROM Places WHERE City = 'Chicago')));
+
+######## Task 4
+
+# I began by saving the xlsx file as a csv file.
+import csv      # This imports the csv module, enabling me to work with a csv file.
+
+# The following 3 lines import sqlite3, create a database for storing my SQL data, and enable me to execute commands using the SQLite cursor.
+import sqlite3
+
+conn = sqlite3.connect('mydb')
+
+cursor = conn.cursor()
+
+
+# 4.1
+# This creates the empty table and schema
+
+#cursor.execute('CREATE TABLE bl_data(ID INTEGER PRIMARY KEY, Composer TEXT NOT NULL, Composer_dates TEXT, Title TEXT NOT NULL, PubDateStd INTEGER NOT NULL, PubDateNonStd INTEGER NOT NULL, Place TEXT, Publisher TEXT)')
+
+# This populates the table with data from the csv file
+
+with open('data_for_sql_task.csv',newline='',encoding="utf-8-sig") as csvfile:
+    reader = csv.DictReader(csvfile)
+    for row in reader:
+        cursor.execute('''INSERT INTO bl_data(ID,Composer,Composer_dates,Title,PubDateStd,PubDateNonStd,Place,Publisher)
+          VALUES(?,?,?,?,?,?,?,?)''',(row["BL record ID"],row["Composer"],row["Composer life dates"],row["Title"],row["Publication date (standardised)"],row["Publication date (not standardised)"],row["Place of publication"],row["Publisher"]))
+
+
+# 4.2
+# This counts the number of different composers found in the dataset
+cursor.execute('''SELECT COUNT(DISTINCT Composer) FROM bl_data''')
+count_composers = cursor.fetchall()
+
+#print(count_composers)
+
+# 4.3
+# This returns the composer's name if an exact match is found.
+# The DISTINCT function ensures that if the composer appears multiple times, the name is only returned once.
+cursor.execute('''SELECT DISTINCT Composer FROM bl_data WHERE Composer = "Aarons, Sam"''')
+find_sam = cursor.fetchall()
+
+#print(find_sam)
+
+# If I wanted to loosen the search parameters, I could look for just the surname (but this would also return "Aarons, Alfred E.")
+cursor.execute('''SELECT DISTINCT Composer FROM bl_data WHERE Composer LIKE "%Aarons%"''')
+find_Aarons = cursor.fetchall()
+
+#print(find_Aarons)
+
+# 4.4
+# This aks the user to search for a city. If that city is found, it returns the name of that city.
+search_term = input("Search for this city: ")
+cursor.execute('SELECT DISTINCT Place FROM bl_data WHERE Place = ?',(search_term,))
+find_city = cursor.fetchall()
+
+print(find_city)
+
+# I could have returned the name of the city every time it is found by deleting DISTINCT after SELECT.
+# I could have returned the entire row whenever the place is found by replacing << SELECT Place >> with << SELECT * >>
+
+# 4.5
+search_end = input("Search for publishers that end with this letter(s): ")
+cursor.execute('SELECT DISTINCT Publisher FROM bl_data WHERE Publisher LIKE ?',('%'+search_end,))
+find_end = cursor.fetchall()
+
+print(find_end)
